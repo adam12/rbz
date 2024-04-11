@@ -14,7 +14,7 @@ Gem::Package::TarWriter.new(io) do |writer|
   end
 end
 
-puts DATA.read
+puts File.read(__FILE__).split("__END__").last.strip
 puts
 puts "__END__"
 puts [io.string].pack("m")
