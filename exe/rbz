@@ -10,7 +10,8 @@ Gem::Package::TarWriter.new(io) do |writer|
   Dir.chdir(source) do
     Dir.children(Dir.pwd).each do |e|
       next if File.directory?(e)
-      writer.add_file(e, "0644") { |fio| fio.write File.read(e) }
+      mode = File.lstat(e).mode
+      writer.add_file(e, mode) { |fio| fio.write File.read(e) }
     end
   end
 end
@@ -35,6 +36,7 @@ Dir.mktmpdir("rbz") do |dir|
         next if entry.full_name.start_with?("PaxHeader")
 
         File.write(entry.full_name, entry.read)
+        File.chmod(entry.header.mode, entry.full_name)
       end
     end
 
