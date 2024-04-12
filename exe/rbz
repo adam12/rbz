@@ -69,7 +69,7 @@ Dir.mktmpdir("rbz") do |dir|
         next if entry.full_name.start_with?("PaxHeader")
 
         FileUtils.mkdir_p(File.dirname(entry.full_name))
-        File.write(entry.full_name, entry.read, mode: "wb")
+        File.binwrite(entry.full_name, entry.read)
         File.chmod(entry.header.mode, entry.full_name)
       end
     end
