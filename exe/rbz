@@ -3,6 +3,16 @@
 require "rubygems/package"
 require "stringio"
 require "zlib"
+require "optionparser"
+require "erb"
+
+options = {}
+OptionParser.new do |parser|
+  parser.banner = "Usage: rbz [options] folder"
+  parser.on("--iseq", "Store compiled Ruby iseq") do |v|
+    options[:iseq] = v
+  end
+end.parse!
 
 source = ARGV[0] or abort "Error: Missing source directory"
 io = StringIO.new
@@ -12,12 +22,19 @@ Gem::Package::TarWriter.new(io) do |writer|
     Dir.glob("**/*").each do |e|
       next if File.directory?(e)
       mode = File.lstat(e).mode
-      writer.add_file(e, mode) { |fio| fio.write File.read(e, mode: "rb") }
+
+      if options[:iseq] && File.extname(e) == ".rb"
+        contents = RubyVM::InstructionSequence.compile_file(e).to_binary
+        writer.add_file(e + ".iseq", mode) { |fio| fio.write(contents) }
+      end
+
+      $stderr.puts "a #{e}" if $DEBUG
+      writer.add_file(e, mode) { |fio| fio.write(File.binread(e)) }
     end
   end
 end
 
-puts File.read(__FILE__).split("__END__").last.strip
+puts ERB.new(File.read(__FILE__).split("__END__").last.strip, trim_mode: "-").result(binding)
 puts
 puts "__END__"
 puts [Zlib::Deflate.deflate(io.string)].pack("m")
@@ -29,6 +46,19 @@ require "tmpdir"
 require "rubygems/package"
 require "stringio"
 require "zlib"
+
+<% if options[:iseq] -%>
+module ISeqMixin
+  def load_iseq(path)
+    if File.exist?(path + ".iseq")
+      path = path + ".iseq"
+      RubyVM::InstructionSequence.load_from_binary(File.binread(path))
+    end
+  rescue SyntaxError, RuntimeError
+    nil
+  end
+end
+<% end -%>
 
 Dir.mktmpdir("rbz") do |dir|
   Dir.chdir(dir) do
@@ -43,6 +73,12 @@ Dir.mktmpdir("rbz") do |dir|
         File.chmod(entry.header.mode, entry.full_name)
       end
     end
+
+    <% if options[:iseq] %>
+    class << RubyVM::InstructionSequence
+      prepend ISeqMixin
+    end
+    <% end -%>
 
     load "main.rb"
   end
