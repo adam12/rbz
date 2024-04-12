@@ -9,7 +9,6 @@ Gem::Specification.new do |spec|
   spec.email = ["adam@mediadrive.ca"]
 
   spec.summary = "Single file Ruby archives. Crazy? Maybe."
-  spec.description = "TODO: Write a longer description or delete this line."
   spec.homepage = "https://github.com/adam12/rbz"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
