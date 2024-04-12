@@ -41,6 +41,6 @@ Dir.mktmpdir("rbz") do |dir|
       end
     end
 
-    exec "ruby", "main.rb"
+    exec "ruby", "main.rb", *ARGV
   end
 end
