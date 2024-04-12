@@ -2,6 +2,7 @@
 
 require "rubygems/package"
 require "stringio"
+require "zlib"
 
 source = ARGV[0] or abort "Error: Missing source directory"
 io = StringIO.new
@@ -19,17 +20,18 @@ end
 puts File.read(__FILE__).split("__END__").last.strip
 puts
 puts "__END__"
-puts [io.string].pack("m")
+puts [Zlib::Deflate.deflate(io.string)].pack("m")
 
 __END__
 
 require "tmpdir"
 require "rubygems/package"
 require "stringio"
+require "zlib"
 
 Dir.mktmpdir("rbz") do |dir|
   Dir.chdir(dir) do
-    tar = StringIO.new(DATA.read.unpack1("m"))
+    tar = StringIO.new(Zlib::Inflate.inflate(DATA.read.unpack1("m")))
     Gem::Package::TarReader.new(tar) do |reader|
       reader.each do |entry|
         next if entry.full_name.start_with?("._")
