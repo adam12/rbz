@@ -24,6 +24,7 @@ puts [Zlib::Deflate.deflate(io.string)].pack("m")
 
 __END__
 
+#!/usr/bin/env ruby
 require "tmpdir"
 require "rubygems/package"
 require "stringio"
