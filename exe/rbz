@@ -11,7 +11,7 @@ Gem::Package::TarWriter.new(io) do |writer|
     Dir.glob("**/*").each do |e|
       next if File.directory?(e)
       mode = File.lstat(e).mode
-      writer.add_file(e, mode) { |fio| fio.write File.read(e) }
+      writer.add_file(e, mode) { |fio| fio.write File.read(e, mode: "rb") }
     end
   end
 end
@@ -36,7 +36,7 @@ Dir.mktmpdir("rbz") do |dir|
         next if entry.full_name.start_with?("PaxHeader")
 
         FileUtils.mkdir_p(File.dirname(entry.full_name))
-        File.write(entry.full_name, entry.read)
+        File.write(entry.full_name, entry.read, mode: "wb")
         File.chmod(entry.header.mode, entry.full_name)
       end
     end
