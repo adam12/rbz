@@ -42,7 +42,7 @@ Gem::Package::TarWriter.new(io) do |writer|
         writer.add_file(e + ".iseq", mode) { |fio| fio.write(contents) }
       end
 
-      $stderr.puts "a #{e}" if options[:debug] # standardrb:disable Style/StderrPuts
+      $stderr.puts "a #{e}" if options[:debug] # standard:disable Style/StderrPuts
       writer.add_file(e, mode) { |fio| fio.write(File.binread(e)) }
     end
   end
