@@ -13,6 +13,7 @@ options = {
 
 parser = OptionParser.new do |parser|
   parser.accept(File) do |path|
+    abort "Error: #{path} already exists" if File.exist?(path)
     f = File.open(path, mode: "w")
     File.chmod(0o755, path)
     f
