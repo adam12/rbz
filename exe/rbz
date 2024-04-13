@@ -11,7 +11,7 @@ options = {
 }
 parser = OptionParser.new do |parser|
   parser.banner = "Usage: rbz [options] folder"
-  parser.on("--iseq", "Store compiled Ruby iseq")
+  parser.on("-c", "--compile", "Store compiled Ruby iseq")
   parser.on("-m FILE", "--main FILE", "Main entrypoint")
 end
 parser.parse!(into: options)
@@ -25,7 +25,7 @@ Gem::Package::TarWriter.new(io) do |writer|
       next if File.directory?(e)
       mode = File.lstat(e).mode
 
-      if options[:iseq] && File.extname(e) == ".rb"
+      if options[:compile] && File.extname(e) == ".rb"
         contents = RubyVM::InstructionSequence.compile_file(e).to_binary
         writer.add_file(e + ".iseq", mode) { |fio| fio.write(contents) }
       end
@@ -49,7 +49,7 @@ require "rubygems/package"
 require "stringio"
 require "zlib"
 
-<% if options[:iseq] -%>
+<% if options[:compile] -%>
 module ISeqMixin
   def load_iseq(path)
     if File.exist?(path + ".iseq")
@@ -76,7 +76,7 @@ Dir.mktmpdir("rbz") do |dir|
       end
     end
 
-    <% if options[:iseq] %>
+    <% if options[:compile] %>
     class << RubyVM::InstructionSequence
       prepend ISeqMixin
     end
