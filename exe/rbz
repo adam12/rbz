@@ -22,6 +22,7 @@ parser = OptionParser.new do |parser|
   parser.on("-c", "--compile", "Store compiled Ruby iseq")
   parser.on("-m FILE", "--main FILE", "Main entrypoint")
   parser.on("-o FILE", "--output FILE", File, "Output path (default: stdout)")
+  parser.on("--debug", "Enable debugging")
 end
 parser.parse!(into: options)
 
@@ -40,7 +41,7 @@ Gem::Package::TarWriter.new(io) do |writer|
         writer.add_file(e + ".iseq", mode) { |fio| fio.write(contents) }
       end
 
-      $stderr.puts "a #{e}" if $DEBUG
+      $stderr.puts "a #{e}" if options[:debug]
       writer.add_file(e, mode) { |fio| fio.write(File.binread(e)) }
     end
   end
