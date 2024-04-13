@@ -7,12 +7,13 @@ require "optionparser"
 require "erb"
 
 options = {}
-OptionParser.new do |parser|
+parser = OptionParser.new do |parser|
   parser.banner = "Usage: rbz [options] folder"
   parser.on("--iseq", "Store compiled Ruby iseq")
-end.parse!(into: options)
+end
+parser.parse!(into: options)
 
-source = ARGV[0] or abort "Error: Missing source directory"
+source = ARGV[0] or abort(parser.to_s)
 io = StringIO.new
 
 Gem::Package::TarWriter.new(io) do |writer|
