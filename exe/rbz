@@ -6,10 +6,13 @@ require "zlib"
 require "optionparser"
 require "erb"
 
-options = {}
+options = {
+  main: "main.rb"
+}
 parser = OptionParser.new do |parser|
   parser.banner = "Usage: rbz [options] folder"
   parser.on("--iseq", "Store compiled Ruby iseq")
+  parser.on("-m FILE", "--main FILE", "Main entrypoint")
 end
 parser.parse!(into: options)
 
@@ -79,6 +82,6 @@ Dir.mktmpdir("rbz") do |dir|
     end
     <% end -%>
 
-    load "main.rb"
+    load "<%= options[:main] %>"
   end
 end
