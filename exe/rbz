@@ -9,10 +9,8 @@ require "erb"
 options = {}
 OptionParser.new do |parser|
   parser.banner = "Usage: rbz [options] folder"
-  parser.on("--iseq", "Store compiled Ruby iseq") do |v|
-    options[:iseq] = v
-  end
-end.parse!
+  parser.on("--iseq", "Store compiled Ruby iseq")
+end.parse!(into: options)
 
 source = ARGV[0] or abort "Error: Missing source directory"
 io = StringIO.new
