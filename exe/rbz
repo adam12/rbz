@@ -7,16 +7,26 @@ require "optionparser"
 require "erb"
 
 options = {
-  main: "main.rb"
+  main: "main.rb",
+  output: $stdout
 }
+
 parser = OptionParser.new do |parser|
+  parser.accept(File) do |path|
+    f = File.open(path, mode: "w")
+    File.chmod(0o755, path)
+    f
+  end
+
   parser.banner = "Usage: rbz [options] folder"
   parser.on("-c", "--compile", "Store compiled Ruby iseq")
   parser.on("-m FILE", "--main FILE", "Main entrypoint")
+  parser.on("-o FILE", "--output FILE", File, "Output path (default: stdout)")
 end
 parser.parse!(into: options)
 
 source = ARGV[0] or abort(parser.to_s)
+output = options[:output]
 io = StringIO.new
 
 Gem::Package::TarWriter.new(io) do |writer|
@@ -36,10 +46,10 @@ Gem::Package::TarWriter.new(io) do |writer|
   end
 end
 
-puts ERB.new(File.read(__FILE__).split("__END__").last.strip, trim_mode: "-").result(binding)
-puts
-puts "__END__"
-puts [Zlib::Deflate.deflate(io.string)].pack("m")
+output.puts ERB.new(File.read(__FILE__).split("__END__").last.strip, trim_mode: "-").result(binding)
+output.puts
+output.puts "__END__"
+output.puts [Zlib::Deflate.deflate(io.string)].pack("m")
 
 __END__
 
