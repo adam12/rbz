@@ -23,7 +23,7 @@ parser = OptionParser.new do |parser|
   parser.on("-c", "--compile", "Store compiled Ruby iseq")
   parser.on("-m FILE", "--main FILE", "Main entrypoint")
   parser.on("-o FILE", "--output FILE", File, "Output path (default: stdout)")
-  parser.on("--debug", "Enable debugging")
+  parser.on("--verbose", "Verbose mode")
 end
 parser.parse!(into: options)
 
@@ -39,10 +39,11 @@ Gem::Package::TarWriter.new(io) do |writer|
 
       if options[:compile] && File.extname(e) == ".rb"
         contents = RubyVM::InstructionSequence.compile_file(e).to_binary
+        $stderr.puts "a #{e}.iseq" if options[:verbose] # standard:disable Style/StderrPuts
         writer.add_file(e + ".iseq", mode) { |fio| fio.write(contents) }
       end
 
-      $stderr.puts "a #{e}" if options[:debug] # standard:disable Style/StderrPuts
+      $stderr.puts "a #{e}" if options[:verbose] # standard:disable Style/StderrPuts
       writer.add_file(e, mode) { |fio| fio.write(File.binread(e)) }
     end
   end
