@@ -95,6 +95,6 @@ Dir.mktmpdir("rbz") do |dir|
     end
     <% end -%>
 
-    load "<%= options[:main] %>"
+    load File.expand_path("<%= options[:main] %>", dir)
   end
 end
