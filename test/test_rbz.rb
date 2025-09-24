@@ -2,12 +2,12 @@
 
 require "test_helper"
 
-class TestRbz < Minitest::Test
+class TestRBZ < Minitest::Test
   ROOT = File.expand_path("..", __dir__)
   RUBY = RbConfig.ruby
 
   def test_that_it_has_a_version_number
-    refute_nil ::Rbz::VERSION
+    refute_nil ::RBZ::VERSION
   end
 
   def test_it_does_something_useful

@@ -4,7 +4,7 @@ require "zlib"
 require "optionparser"
 require "erb"
 
-module Rbz
+module RBZ
   module CLI
     def self.run(argv)
       options = {
@@ -50,7 +50,7 @@ module Rbz
         end
       end
 
-      output.puts ERB.new(Rbz.templates.join("bin.rb.erb").read, trim_mode: "-").result(binding)
+      output.puts ERB.new(RBZ.templates.join("bin.rb.erb").read, trim_mode: "-").result(binding)
       output.puts
       output.puts "__END__"
       output.puts [Zlib::Deflate.deflate(io.string)].pack("m")

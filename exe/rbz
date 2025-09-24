@@ -2,4 +2,4 @@
 
 require "rbz"
 
-Rbz::CLI.run(ARGV)
+RBZ::CLI.run(ARGV)

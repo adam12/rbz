@@ -4,7 +4,7 @@ require_relative "lib/rbz/version"
 
 Gem::Specification.new do |spec|
   spec.name = "rbz"
-  spec.version = Rbz::VERSION
+  spec.version = RBZ::VERSION
   spec.authors = ["Adam Daniels"]
   spec.email = ["adam@mediadrive.ca"]
 
