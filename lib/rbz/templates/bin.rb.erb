@@ -24,16 +24,21 @@ dir = File.join(Dir.tmpdir, "rbz-#{sha256}")
 Dir.mkdir(dir) unless Dir.exist?(dir)
 
 Dir.chdir(dir) do
-  tar = StringIO.new(Zlib::Inflate.inflate(DATA.read.unpack1("m")))
-  Gem::Package::TarReader.new(tar) do |reader|
-    reader.each do |entry|
-      next if entry.full_name.start_with?("._")
-      next if entry.full_name.start_with?("PaxHeader")
+  sentinel = File.join(dir, ".rbz")
+  if !File.exist?(sentinel)
+    tar = StringIO.new(Zlib::Inflate.inflate(DATA.read.unpack1("m")))
+    Gem::Package::TarReader.new(tar) do |reader|
+      reader.each do |entry|
+        next if entry.full_name.start_with?("._")
+        next if entry.full_name.start_with?("PaxHeader")
 
-      FileUtils.mkdir_p(File.dirname(entry.full_name))
-      File.binwrite(entry.full_name, entry.read)
-      File.chmod(entry.header.mode, entry.full_name)
+        FileUtils.mkdir_p(File.dirname(entry.full_name))
+        File.binwrite(entry.full_name, entry.read)
+        File.chmod(entry.header.mode, entry.full_name)
+      end
     end
+
+    File.write(sentinel, "")
   end
 
   <% if options[:compile] %>
