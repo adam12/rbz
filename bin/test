@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -e
+
+echo "Testing rbz compression and execution..."
+
+# Test example directory
+echo "Testing example..."
+ruby -Ilib exe/rbz example > example.rbz
+chmod +x example.rbz
+output1=$(ruby example.rbz)
+expected1="Hello world"
+if [ "$output1" = "$expected1" ]; then
+  echo "✅ example test passed: '$output1'"
+else
+  echo "❌ example test failed: expected '$expected1', got '$output1'"
+  exit 1
+fi
+
+# Test example_2 directory
+echo "Testing example_2..."
+ruby -Ilib exe/rbz example_2 > example_2.rbz
+chmod +x example_2.rbz
+output2=$(ruby example_2.rbz)
+expected2="Hello from other file"
+if [ "$output2" = "$expected2" ]; then
+  echo "✅ example_2 test passed: '$output2'"
+else
+  echo "❌ example_2 test failed: expected '$expected2', got '$output2'"
+  exit 1
+fi
+
+echo "All tests passed! 🎉"
+
+# Clean up generated files
+rm -f example.rbz example_2.rbz
