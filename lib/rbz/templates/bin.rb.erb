@@ -3,6 +3,8 @@ require "tmpdir"
 require "rubygems/package"
 require "stringio"
 require "zlib"
+require "digest"
+require "tmpdir"
 
 <% if options[:compile] -%>
 module ISeqMixin
@@ -17,26 +19,28 @@ module ISeqMixin
 end
 <% end -%>
 
-Dir.mktmpdir("rbz") do |dir|
-  Dir.chdir(dir) do
-    tar = StringIO.new(Zlib::Inflate.inflate(DATA.read.unpack1("m")))
-    Gem::Package::TarReader.new(tar) do |reader|
-      reader.each do |entry|
-        next if entry.full_name.start_with?("._")
-        next if entry.full_name.start_with?("PaxHeader")
+sha256 = Digest::SHA256.hexdigest(File.read(__FILE__))
+dir = File.join(Dir.tmpdir, "rbz-#{sha256}")
+Dir.mkdir(dir) unless Dir.exist?(dir)
 
-        FileUtils.mkdir_p(File.dirname(entry.full_name))
-        File.binwrite(entry.full_name, entry.read)
-        File.chmod(entry.header.mode, entry.full_name)
-      end
+Dir.chdir(dir) do
+  tar = StringIO.new(Zlib::Inflate.inflate(DATA.read.unpack1("m")))
+  Gem::Package::TarReader.new(tar) do |reader|
+    reader.each do |entry|
+      next if entry.full_name.start_with?("._")
+      next if entry.full_name.start_with?("PaxHeader")
+
+      FileUtils.mkdir_p(File.dirname(entry.full_name))
+      File.binwrite(entry.full_name, entry.read)
+      File.chmod(entry.header.mode, entry.full_name)
     end
-
-    <% if options[:compile] %>
-    class << RubyVM::InstructionSequence
-      prepend ISeqMixin
-    end
-    <% end -%>
-
-    load File.expand_path("<%= options[:main] %>", dir)
   end
+
+  <% if options[:compile] %>
+  class << RubyVM::InstructionSequence
+    prepend ISeqMixin
+  end
+  <% end -%>
+
+  load File.expand_path("<%= options[:main] %>", dir)
 end
