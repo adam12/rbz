@@ -21,7 +21,7 @@ parser = OptionParser.new do |parser|
 
   parser.banner = "Usage: rbz [options] folder"
   parser.on("-c", "--compile", "Store compiled Ruby iseq")
-  parser.on("-m FILE", "--main FILE", "Main entrypoint")
+  parser.on("-m FILE", "--main FILE", "Main entrypoint (relative to folder, default: main.rb)")
   parser.on("-o FILE", "--output FILE", File, "Output path (default: stdout)")
   parser.on("--verbose", "Verbose mode")
 end
