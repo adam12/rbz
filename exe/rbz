@@ -5,6 +5,7 @@ require "stringio"
 require "zlib"
 require "optionparser"
 require "erb"
+require "rbz"
 
 options = {
   main: "main.rb",
@@ -49,52 +50,7 @@ Gem::Package::TarWriter.new(io) do |writer|
   end
 end
 
-output.puts ERB.new(File.read(__FILE__).split("__END__").last.strip, trim_mode: "-").result(binding)
+output.puts ERB.new(Rbz.templates.join("bin.rb.erb").read, trim_mode: "-").result(binding)
 output.puts
 output.puts "__END__"
 output.puts [Zlib::Deflate.deflate(io.string)].pack("m")
-
-__END__
-
-#!/usr/bin/env ruby
-require "tmpdir"
-require "rubygems/package"
-require "stringio"
-require "zlib"
-
-<% if options[:compile] -%>
-module ISeqMixin
-  def load_iseq(path)
-    if File.exist?(path + ".iseq")
-      path = path + ".iseq"
-      RubyVM::InstructionSequence.load_from_binary(File.binread(path))
-    end
-  rescue SyntaxError, RuntimeError
-    nil
-  end
-end
-<% end -%>
-
-Dir.mktmpdir("rbz") do |dir|
-  Dir.chdir(dir) do
-    tar = StringIO.new(Zlib::Inflate.inflate(DATA.read.unpack1("m")))
-    Gem::Package::TarReader.new(tar) do |reader|
-      reader.each do |entry|
-        next if entry.full_name.start_with?("._")
-        next if entry.full_name.start_with?("PaxHeader")
-
-        FileUtils.mkdir_p(File.dirname(entry.full_name))
-        File.binwrite(entry.full_name, entry.read)
-        File.chmod(entry.header.mode, entry.full_name)
-      end
-    end
-
-    <% if options[:compile] %>
-    class << RubyVM::InstructionSequence
-      prepend ISeqMixin
-    end
-    <% end -%>
-
-    load File.expand_path("<%= options[:main] %>", dir)
-  end
-end
