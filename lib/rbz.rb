@@ -2,6 +2,7 @@
 
 require "pathname"
 require_relative "rbz/version"
+require_relative "rbz/cli"
 
 module Rbz
   def self.templates
