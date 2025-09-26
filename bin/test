@@ -31,6 +31,17 @@ else
   exit 1
 fi
 
+echo "Testing examples/bundled..."
+ruby -Ilib exe/rbz examples/bundled > $dest
+chmod +x $dest
+ruby $dest
+if [ $? -eq 0 ]; then
+  echo "✅ examples/bundled test passed"
+else
+  echo "❌ examples/bundled test failed"
+  exit 1
+fi
+
 echo "All tests passed! 🎉"
 
 # Clean up generated files
