@@ -3,11 +3,13 @@ set -e
 
 echo "Testing rbz compression and execution..."
 
+dest=$(mktemp)
+
 # Test example directory
 echo "Testing example..."
-ruby -Ilib exe/rbz example > example.rbz
-chmod +x example.rbz
-output1=$(ruby example.rbz)
+ruby -Ilib exe/rbz example > $dest
+chmod +x $dest
+output1=$(ruby $dest)
 expected1="Hello world"
 if [ "$output1" = "$expected1" ]; then
   echo "✅ example test passed: '$output1'"
@@ -18,9 +20,9 @@ fi
 
 # Test example_2 directory
 echo "Testing example_2..."
-ruby -Ilib exe/rbz example_2 > example_2.rbz
-chmod +x example_2.rbz
-output2=$(ruby example_2.rbz)
+ruby -Ilib exe/rbz example_2 > $dest
+chmod +x $dest
+output2=$(ruby $dest)
 expected2="Hello from other file"
 if [ "$output2" = "$expected2" ]; then
   echo "✅ example_2 test passed: '$output2'"
@@ -32,4 +34,4 @@ fi
 echo "All tests passed! 🎉"
 
 # Clean up generated files
-rm -f example.rbz example_2.rbz
+rm -f "$dest"
