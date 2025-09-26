@@ -41,11 +41,11 @@ Dir.chdir(dir) do
     File.write(sentinel, "")
   end
 
-  <% if options[:compile] %>
+  <%- if options[:compile] -%>
   class << RubyVM::InstructionSequence
     prepend ISeqMixin
   end
-  <% end -%>
+  <%- end -%>
 
   <%- if options[:bundle] -%>
   bundle_path = File.join(dir, "bundle/load.rb")
