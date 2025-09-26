@@ -47,10 +47,12 @@ Dir.chdir(dir) do
   end
   <% end -%>
 
+  <%- if options[:bundle] -%>
   bundle_path = File.join(dir, "bundle/load.rb")
   if File.exist?(bundle_path)
     require bundle_path
   end
+  <%- end -%>
 
   load File.expand_path("<%= options[:main] %>", dir)
 end
