@@ -36,6 +36,9 @@ module RBZ
 
       Gem::Package::TarWriter.new(io) do |writer|
         Dir.chdir(source) do
+          # Can't use bundle if no Gemfile
+          options[:bundle] = false unless File.exist?("Gemfile")
+
           if options[:bundle]
             system("bundle install --standalone >/dev/null 2>&1") or abort "Error: bundle install failed"
             File.delete("bundle/bundler/setup.rb")
