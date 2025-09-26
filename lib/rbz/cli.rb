@@ -9,7 +9,8 @@ module RBZ
     def self.run(argv)
       options = {
         main: "main.rb",
-        output: $stdout
+        output: $stdout,
+        bundle: true
       }
 
       parser = OptionParser.new do |parser|
