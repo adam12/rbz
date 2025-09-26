@@ -5,22 +5,21 @@ echo "Testing rbz compression and execution..."
 
 dest=$(mktemp)
 
-# Test example directory
-echo "Testing example..."
-ruby -Ilib exe/rbz example > $dest
+echo "Testing example_1..."
+ruby -Ilib exe/rbz examples/example_1 > $dest
 chmod +x $dest
 output1=$(ruby $dest)
 expected1="Hello world"
 if [ "$output1" = "$expected1" ]; then
-  echo "✅ example test passed: '$output1'"
+  echo "✅ example_1 test passed: '$output1'"
 else
-  echo "❌ example test failed: expected '$expected1', got '$output1'"
+  echo "❌ example_1 test failed: expected '$expected1', got '$output1'"
   exit 1
 fi
 
 # Test example_2 directory
 echo "Testing example_2..."
-ruby -Ilib exe/rbz example_2 > $dest
+ruby -Ilib exe/rbz examples/example_2 > $dest
 chmod +x $dest
 output2=$(ruby $dest)
 expected2="Hello from other file"
