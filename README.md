@@ -25,6 +25,14 @@ Once the archive is generated, run it with `ruby`.
 
     $ ruby my-archive.rbz
 
+### Applications with simple Gemfile's
+
+If your application's Gemfile is simple (ie. no git or path sources, no C extensions)
+there is a good chance you can package it with rbz.
+
+rbz uses `bundle install --standalone` to vendor your dependencies, and then writes
+out it's own loader that sets up the load path to use those vendored gems.
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
