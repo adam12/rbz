@@ -24,6 +24,7 @@ module RBZ
         parser.on("-c", "--compile", "Store compiled Ruby iseq")
         parser.on("-m FILE", "--main FILE", "Main entrypoint (relative to folder, default: main.rb)")
         parser.on("-o FILE", "--output FILE", File, "Output path (default: stdout)")
+        parser.on("-b", "--[no-]bundle", "Use bundle if exists (default: true)")
         parser.on("--verbose", "Verbose mode")
       end
       parser.parse!(into: options)
@@ -34,6 +35,19 @@ module RBZ
 
       Gem::Package::TarWriter.new(io) do |writer|
         Dir.chdir(source) do
+          if options[:bundle]
+            system("bundle install --standalone >/dev/null 2>&1") or abort "Error: bundle install failed"
+            File.delete("bundle/bundler/setup.rb")
+            Dir.delete("bundle/bundler")
+            File.open("bundle/load.rb", "w") do |f|
+              f.puts "path = File.expand_path('../..', __FILE__)"
+
+              Dir["bundle/ruby/**/lib"].each do |dir|
+                f.puts %Q[$LOAD_PATH.unshift "\#{path}/#{dir}"]
+              end
+            end
+          end
+
           Dir.glob("**/*").each do |e|
             next if File.directory?(e)
             mode = File.lstat(e).mode
