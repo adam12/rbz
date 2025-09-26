@@ -34,6 +34,9 @@ module RBZ
       output = options[:output]
       io = StringIO.new
 
+      # Default output to stderr
+      $> = $stderr
+
       Gem::Package::TarWriter.new(io) do |writer|
         Dir.chdir(source) do
           # Can't use bundle if no Gemfile
