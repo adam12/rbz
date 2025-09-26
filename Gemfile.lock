@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rbz (0.2.0)
+    rbz (0.3.0)
 
 GEM
   remote: https://rubygems.org/
